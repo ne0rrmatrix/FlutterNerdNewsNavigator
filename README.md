@@ -1,2 +1,5 @@
-# FlutterNerdNewsNavigator
-NerdNewSNavigator re-written in Flutter
+# nerdnewsnavigator
+
+A flutter version of NerdNewsNavigator.
+
+## Not ready yet!
