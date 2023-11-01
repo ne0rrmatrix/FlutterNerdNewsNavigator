@@ -4,9 +4,35 @@ import 'package:nerdnewsnavigator3/components/podcast.dart';
 import 'package:nerdnewsnavigator3/components/shows.dart';
 import 'package:xml2json/xml2json.dart';
 import 'package:opml/opml.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 class Services {
   var item = 'https://feeds.twit.tv/twitshows_video_hd.opml';
+
+  YoutubeExplode youtube = YoutubeExplode();
+  //YoutubeHttpClient client = YoutubeHttpClient();
+
+  Future<String> getLiveUrl() async {
+    String item = "https://www.youtube.com/user/twit";
+    http.Response response = await http.get(Uri.parse(item));
+    var result = response.body.toString();
+    var start = result.indexOf('watch?v=') + 8;
+    var end = start + 11;
+    var url = result.substring(start, end);
+    var string = 'https://www.youtube.com/watch?v=$url';
+    return string;
+  }
+
+  Future<String> getHLSUrl() async {
+    var yt = YoutubeExplode();
+    var item = await getLiveUrl();
+    var temp = await yt.videos.get(item);
+
+    var result = await yt.videos.streams.getHttpLiveStreamUrl(temp.id);
+    yt.close();
+    return result;
+  }
+
   Future<List<Show>> getShows(String url) async {
     Xml2Json xml2json = Xml2Json();
     //print('url: $url');
@@ -58,8 +84,6 @@ class Services {
       podcast.image = list['image']['url'];
       podcast.pubDate = list['pubDate'];
       podcasts.add(podcast);
-      //print(podcast.title);
-      //print(podcast.image);
     }
 
     return podcasts;

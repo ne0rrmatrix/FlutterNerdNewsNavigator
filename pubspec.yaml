@@ -45,6 +45,8 @@ dependencies:
   xml2json: ^6.2.0
   opml: ^0.4.0
   flutter_html: ^3.0.0-beta.2
+  youtube_explode_dart: ^2.0.2
+  chewie: ^1.7.1
 
 dev_dependencies:
   flutter_test:

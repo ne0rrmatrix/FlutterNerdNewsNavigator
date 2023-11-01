@@ -63,26 +63,28 @@ class _ShowPageState extends State<ShowPage> {
           }
           if (snapshot.hasError) {
             return Scaffold(
+                drawer: const NavBar(),
+                appBar: AppBar(
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                  title: const Text('Podcast Page'),
+                ),
+                body: const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.deepOrangeAccent,
+                  ),
+                ));
+          }
+          return Scaffold(
               drawer: const NavBar(),
               appBar: AppBar(
                 backgroundColor: Theme.of(context).colorScheme.inversePrimary,
                 title: const Text('Podcast Page'),
               ),
-              body: const CircularProgressIndicator(
-                color: Colors.deepOrangeAccent,
-              ),
-            );
-          }
-          return Scaffold(
-            drawer: const NavBar(),
-            appBar: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              title: const Text('Podcast Page'),
-            ),
-            body: const CircularProgressIndicator(
-              color: Colors.deepOrangeAccent,
-            ),
-          );
+              body: const Center(
+                child: CircularProgressIndicator(
+                  color: Colors.deepOrangeAccent,
+                ),
+              ));
         });
   }
 }
