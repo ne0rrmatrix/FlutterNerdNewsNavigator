@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:nerdnewsnavigator3/components/shows.dart';
 import 'package:nerdnewsnavigator3/screens/nav_bar.dart';
@@ -50,11 +51,12 @@ class _ShowPageState extends State<ShowPage> {
                               },
                               borderRadius: BorderRadius.circular(8),
                               child: ClipRect(
-                                clipBehavior: Clip.hardEdge,
-                                child: Image.network(
-                                  data[index].image,
-                                ),
-                              )),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: CachedNetworkImage(
+                                    imageUrl: data[index].image,
+                                    placeholder: (context, url) => const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) => const Icon(Icons.error),
+                                  ))),
                         )
                       ],
                     );
