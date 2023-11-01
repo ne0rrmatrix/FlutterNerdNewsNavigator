@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nerdnewsnavigator3/screens/nav_bar.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:nerdnewsnavigator3/services.dart';
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
+import 'package:video_player_control_panel/video_player_control_panel.dart';
 
 class LivePlayerPage extends StatefulWidget {
-  static const String routeName = '/livePlayerPage';
+  static String routeName = '/livePlayerPage';
   const LivePlayerPage({Key? key}) : super(key: key);
 
   @override
@@ -11,62 +15,77 @@ class LivePlayerPage extends StatefulWidget {
 }
 
 class _LivePlayerPageState extends State<LivePlayerPage> {
+  late VideoPlayerController _controller;
+  late ChewieController _chewieController;
   @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      drawer: const NavBar(),
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('Show Page'),
-      ),
-      body: const NewWidget(),
-    );
+  void initState() {
+    super.initState();
+    setState(() {});
   }
-}
-
-class NewWidget extends StatefulWidget {
-  const NewWidget({
-    super.key,
-  });
 
   @override
-  State<NewWidget> createState() => _NewWidgetState();
-}
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+    _chewieController.dispose();
+  }
 
-class _NewWidgetState extends State<NewWidget> {
-  static String videoId = YoutubePlayer.convertUrlToId("https://www.youtube.com/watch?v=1YZmMY8w1lM") ?? '';
-  final YoutubePlayerController _controller = YoutubePlayerController(
-    initialVideoId: videoId,
-    flags: const YoutubePlayerFlags(
-      autoPlay: false,
-      mute: true,
-    ),
-  );
+  Future<String> getUrl() async {
+    Services service = Services();
+    var url = await service.getHLSUrl();
+
+    _controller = VideoPlayerController.networkUrl(Uri.parse(url.toString()));
+    _controller.initialize().then((value) {
+      _chewieController = ChewieController(
+        videoPlayerController: _controller,
+        autoPlay: true,
+        looping: false,
+      );
+      if (!kIsWeb) _controller.play();
+      setState(() {});
+    });
+    return url;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayerBuilder(
-        player: YoutubePlayer(
-          controller: _controller,
-        ),
-        builder: (context, player) {
-          return Column(
-            children: [
-              // some widgets
-              player,
-              //some other widgets
-            ],
+    return FutureBuilder(
+      future: getUrl(),
+      builder: ((context, snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            drawer: const NavBar(),
+            appBar: AppBar(
+              title: const Text('Video Page'),
+            ),
+            body: JkVideoControlPanel(_controller, showFullscreenButton: true, showVolumeButton: true),
           );
-        });
+        }
+        if (snapshot.hasError) {
+          return Scaffold(
+            drawer: const NavBar(),
+            appBar: AppBar(
+              title: const Text('Live Video Player'),
+            ),
+            body: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.deepOrangeAccent,
+              ),
+            ),
+          );
+        }
+        return Scaffold(
+          drawer: const NavBar(),
+          appBar: AppBar(
+            title: const Text('Live Video Player'),
+          ),
+          body: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.deepOrangeAccent,
+            ),
+          ),
+        );
+      }),
+    );
   }
 }
