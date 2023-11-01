@@ -47,6 +47,9 @@ dependencies:
   flutter_html: ^3.0.0-beta.2
   youtube_explode_dart: ^2.0.2
   chewie: ^1.7.1
+  sqflite: ^2.3.0
+  path: ^1.8.3
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_test:

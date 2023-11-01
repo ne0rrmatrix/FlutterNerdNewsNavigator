@@ -1,10 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nerdnewsnavigator3/screens/nav_bar.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPlayerPage extends StatefulWidget {
   static String routeName = '/videoPlayerPage';
@@ -31,13 +30,24 @@ class _VideoPlayerPageState extends State<VideoPlayerPage> {
   @override
   void dispose() {
     super.dispose();
+    controller.pause();
     controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    log('test: ${widget.url}');
+    return VisibilityDetector(
+      key: const Key('my-widget-key'),
+      onVisibilityChanged: (visibilityInfo) {
+        if (visibilityInfo.visibleFraction == 0) {
+          controller.pause();
+        }
+      },
+      child: video(context),
+    );
+  }
 
+  Widget video(BuildContext context) {
     return Scaffold(
       drawer: const NavBar(),
       appBar: AppBar(
